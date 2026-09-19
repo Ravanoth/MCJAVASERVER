@@ -151,24 +151,81 @@ app.post('/api/reset', async (req, res) => {
   }
 });
 
-// --- server process control and websockets (existing code) ---
-// Placeholder implementations for startServer/stopServer and websocket behaviour follow.
+// --- server process control and websockets ---
 function startServer() {
   if (serverProcess) return;
-  // spawn a dummy process for demo — replace with actual server spawn
-  serverProcess = spawn('node', ['-e', "setInterval(()=>console.log('tick'),1000)"]); // simple process
-}
-function stopServer() {
-  if (!serverProcess) return;
-  serverProcess.kill();
-  serverProcess = null;
+  const serverJar = path.join(__dirname, 'minecraft', 'server.jar');
+  if (!fs.existsSync(serverJar)) {
+    throw new Error('server.jar not found at ' + serverJar);
+  }
+  // Spawn Java process with the Minecraft server
+  serverProcess = spawn('java', ['-Xmx1G', '-jar', serverJar, 'nogui'], {
+    cwd: path.join(__dirname, 'minecraft'),
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
+
+  serverProcess.stdout.on('data', (data) => {
+    const lines = data.toString().split('\n');
+    lines.forEach(line => {
+      if (line.trim()) broadcast({ type: 'console', line });
+    });
+  });
+
+  serverProcess.stderr.on('data', (data) => {
+    const lines = data.toString().split('\n');
+    lines.forEach(line => {
+      if (line.trim()) broadcast({ type: 'console', line: '[ERR] ' + line });
+    });
+  });
+
+  serverProcess.on('error', (err) => {
+    console.error('Failed to start Minecraft server:', err);
+    broadcast({ type: 'info', msg: 'Failed to start server: ' + err.message });
+    serverProcess = null;
+  });
+
+  serverProcess.on('exit', (code) => {
+    console.log('Server process exited with code', code);
+    serverProcess = null;
+    broadcast({ type: 'info', msg: 'Server stopped' });
+  });
+
+  console.log('Minecraft server process started');
+  broadcast({ type: 'info', msg: 'Server started' });
 }
 
-// Websocket server will send console lines to connected clients. Minimal impl below.
+function stopServer() {
+  if (!serverProcess) return;
+  console.log('Stopping server...');
+  serverProcess.stdin.write('stop\n');
+  // Give it a few seconds to shut down gracefully
+  setTimeout(() => {
+    if (serverProcess) serverProcess.kill();
+  }, 5000);
+}
+
+function broadcast(message) {
+  const data = JSON.stringify(message);
+  clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) client.send(data);
+  });
+}
+
+// Websocket server for console
 const server = require('http').createServer(app);
 wsServer = new WebSocket.Server({ server });
 wsServer.on('connection', ws => {
   clients.add(ws);
+  ws.on('message', (data) => {
+    try {
+      const msg = JSON.parse(data);
+      if (msg.type === 'cmd' && msg.cmd && serverProcess) {
+        serverProcess.stdin.write(msg.cmd + '\n');
+      }
+    } catch (e) {
+      console.error('WS message error', e);
+    }
+  });
   ws.on('close', () => clients.delete(ws));
 });
 
