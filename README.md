@@ -13,7 +13,7 @@ Run these commands from a terminal in the directory where you want the project.
 1. Clone and enter the repo
 
 ```sh
-git clone https://github.com/NullBit9/MCJAVASERVER
+git clone https://github.com/Ravanoth/MCJAVASERVER
 cd MCJAVASERVER
 ```
 
