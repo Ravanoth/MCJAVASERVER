@@ -172,4 +172,4 @@ wsServer.on('connection', ws => {
   ws.on('close', () => clients.delete(ws));
 });
 
-server.listen(process.env.PORT || 3000, () => console.log('server listening'));
+server.listen(process.env.PORT || 3000, () => console.log('server listening at port 3000'));
