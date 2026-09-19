@@ -29,7 +29,7 @@ Automated (recommended):
 
 *Example: download Mojang vanilla server for 26.2*
 ```sh
-MC_VERSION="26.2" node scripts/setupServer.js
+MC_VERSION="26.3" node scripts/setupServer.js
 ```
 
 This will fetch the Mojang version manifest and download the server JAR for the requested version into `./minecraft/server.jar`. If `MC_VERSION` is omitted it will default to `1.26.2`.
