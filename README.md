@@ -27,7 +27,7 @@ npm install
 
 Automated (recommended):
 
-*Example: download Mojang vanilla server for 26.2*
+*Example: download Mojang vanilla server for 26.3*
 ```sh
 MC_VERSION="26.3" node scripts/setupServer.js
 ```
