@@ -17,7 +17,6 @@
   <main class="center-hero">
     <div class="center-inner">
       <div id="auth" class="center-auth">
-        <!-- Register (first visitor) -->
         <div id="registerBox" class="auth-card auth-register">
           <div class="auth-header">
             <h2>Register</h2>
@@ -31,7 +30,6 @@
           </div>
         </div>
 
-        <!-- Login (hidden unless needed) -->
         <div id="loginBox" class="auth-card auth-login hidden">
           <div class="auth-header">
             <h2>Login</h2>
@@ -48,7 +46,6 @@
     </div>
   </main>
 
-  <!-- Admin console (unchanged, hidden by default) -->
   <section class="admin-wrap">
     <div id="admin" class="card hidden">
       <h2>Admin Console</h2>
@@ -59,12 +56,13 @@
       </div>
       <div id="console" class="console" aria-live="polite"></div>
       <div class="cmd-row">
-        <input id="cmdInput" placeholder="enter server command (e.g. say hello)" />
+        <input id="cmdInput" placeholder="enter server command (e.g. say hello)" autocomplete="off" />
         <button id="sendCmd" class="btn">Send</button>
       </div>
     </div>
   </section>
 
+  <script src="/loading-blocks.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
