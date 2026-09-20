@@ -1,4 +1,4 @@
-/* Centered loading animation for future async views. Blocks are drawn procedurally. */
+/* Centered loading animation for future async views. */
 (function () {
   const oldDecor = document.getElementById('mc-js-decor');
   const oldDeploy = document.getElementById('deploy-anim');
@@ -28,23 +28,13 @@
     const colors = block.colors;
     ctx.fillStyle = colors[face === 'top' ? 2 : face === 'bottom' ? 1 : 0];
     ctx.fillRect(0, 0, 32, 32);
-    ctx.fillStyle = 'rgba(255,255,255,.12)';
-    ctx.fillRect(0, 0, 32, 3);
-    ctx.fillStyle = 'rgba(0,0,0,.12)';
-    ctx.fillRect(0, 29, 32, 3);
+    ctx.fillStyle = 'rgba(255,255,255,.14)'; ctx.fillRect(0, 0, 32, 3);
+    ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.fillRect(0, 29, 32, 3);
     ctx.fillStyle = 'rgba(255,255,255,.16)';
     for (let i = 0; i < 16; i++) ctx.fillRect((i * 13) % 32, (i * 7) % 28, 2, 2);
     if (block.name === 'teal' && (face === 'front' || face === 'back')) {
       ctx.fillStyle = 'rgba(0,0,0,.2)';
       ctx.fillRect(8, 8, 6, 6); ctx.fillRect(18, 8, 6, 6); ctx.fillRect(12, 14, 8, 10);
-    }
-    if (block.name === 'purple' && (face === 'front' || face === 'back')) {
-      ctx.fillStyle = 'rgba(255,255,255,.12)';
-      ctx.fillRect(7, 7, 18, 4); ctx.fillRect(10, 14, 12, 5);
-    }
-    if (block.name === 'blue' && (face === 'front' || face === 'back')) {
-      ctx.fillStyle = 'rgba(255,255,255,.13)';
-      ctx.fillRect(6, 8, 4, 16); ctx.fillRect(12, 8, 4, 16); ctx.fillRect(18, 8, 4, 16);
     }
     return 'url(' + canvas.toDataURL('image/png') + ')';
   }
@@ -53,8 +43,7 @@
     const cube = document.createElement('div');
     cube.className = 'mc-loading-cube';
     cube.style.setProperty('--cube-size', size + 'px');
-    cube.style.setProperty('--cube-delay', (-index * 0.75) + 's');
-    cube.style.setProperty('--cube-offset', (index * 7 - 14) + 'px');
+    cube.style.setProperty('--cube-delay', (-index * .22) + 's');
     const faces = [
       ['front', 'translateZ(' + size / 2 + 'px)'],
       ['back', 'rotateY(180deg) translateZ(' + size / 2 + 'px)'],
@@ -77,19 +66,20 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    #mc-loading-screen { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; pointer-events:none; z-index:70; background:rgba(5,5,7,.18); backdrop-filter:blur(1px); transition:opacity .35s ease,visibility .35s ease; }
+    #mc-loading-screen { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; pointer-events:none; z-index:70; background:rgba(5,5,7,.18); perspective:900px; transition:opacity .35s ease,visibility .35s ease; }
     #mc-loading-screen.mc-loading-hidden { opacity:0; visibility:hidden; }
-    .mc-loading-blocks { height:90px; display:flex; align-items:center; justify-content:center; transform-style:preserve-3d; perspective:750px; }
-    .mc-loading-cube { width:var(--cube-size); height:var(--cube-size); margin-left:var(--cube-offset); position:relative; transform-style:preserve-3d; animation:mcLoadingSpin 3.8s cubic-bezier(.65,0,.35,1) infinite; animation-delay:var(--cube-delay); filter:saturate(1.25); }
-    .mc-loading-face { position:absolute; inset:0; box-sizing:border-box; border:1px solid rgba(205,205,205,.72); background-size:cover; backface-visibility:hidden; box-shadow:inset 0 0 10px rgba(255,255,255,.08); }
-    .mc-loading-label { color:#dfe3e8; font:12px/1.2 monospace; letter-spacing:3px; text-transform:uppercase; animation:mcLoadingText 3.8s ease-in-out infinite; }
-    @keyframes mcLoadingSpin { 0%,100% { transform:rotateX(-18deg) rotateY(0deg) rotateZ(0deg); filter:saturate(.25) brightness(.82); } 20% { transform:rotateX(-8deg) rotateY(72deg) rotateZ(4deg); filter:saturate(1.2) brightness(1.1); } 40% { transform:rotateX(12deg) rotateY(144deg) rotateZ(-4deg); filter:saturate(1.7) brightness(1.25); } 60% { transform:rotateX(-8deg) rotateY(216deg) rotateZ(4deg); filter:saturate(1.4) brightness(1.18); } 80% { transform:rotateX(12deg) rotateY(288deg) rotateZ(-4deg); filter:saturate(.8) brightness(.9); } }
+    .mc-loading-blocks { width:340px; height:120px; display:flex; align-items:center; justify-content:center; transform-style:preserve-3d; perspective:900px; overflow:visible; }
+    .mc-loading-cube { flex:0 0 var(--cube-size); width:var(--cube-size); height:var(--cube-size); position:relative; transform-style:preserve-3d; animation:mcLoadingSpin 5s linear infinite; animation-delay:var(--cube-delay); }
+    .mc-loading-face { position:absolute; inset:0; width:100%; height:100%; box-sizing:border-box; border:2px solid rgba(225,225,225,.78); background-size:cover; backface-visibility:visible; box-shadow:inset 0 0 10px rgba(255,255,255,.12); }
+    .mc-loading-label { color:#dfe3e8; font:12px/1.2 monospace; letter-spacing:3px; text-transform:uppercase; animation:mcLoadingText 5s ease-in-out infinite; }
+    @keyframes mcLoadingSpin { 0% { transform:rotateX(-20deg) rotateY(0deg) rotateZ(0deg); filter:saturate(.3) brightness(.82); } 25% { transform:rotateX(12deg) rotateY(90deg) rotateZ(4deg); filter:saturate(1.8) brightness(1.2); } 50% { transform:rotateX(-8deg) rotateY(180deg) rotateZ(-4deg); filter:saturate(1.5) brightness(1.1); } 75% { transform:rotateX(12deg) rotateY(270deg) rotateZ(4deg); filter:saturate(.9) brightness(.95); } 100% { transform:rotateX(-20deg) rotateY(360deg) rotateZ(0deg); filter:saturate(.3) brightness(.82); } }
     @keyframes mcLoadingText { 0%,100% { opacity:.45; } 45%,60% { opacity:1; } }
     @media (prefers-reduced-motion:reduce) { .mc-loading-cube,.mc-loading-label { animation-duration:12s; } }
+    @media (max-width:520px) { .mc-loading-blocks { transform:scale(.7); } }
   `;
   document.head.appendChild(style);
 
   function setLoading(isLoading) { screen.classList.toggle('mc-loading-hidden', !isLoading); }
   window.mcLoading = { start: () => setLoading(true), stop: () => setLoading(false) };
-  window.addEventListener('load', () => setTimeout(() => setLoading(false), 900), { once: true });
+  window.addEventListener('load', () => setTimeout(() => setLoading(false), 5000), { once: true });
 })();
